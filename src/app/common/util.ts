@@ -7,7 +7,10 @@ export function createHttpObservable(url): Observable<any> {
     const signal = controller.signal;
 
     fetch(url, { signal }).then(response => {
-      return response.json();
+      if (response.ok) {
+        return response.json();
+      }
+      t.error(`Request failed with status code = ${response.status}`);
     }).then(body => {
       t.next(body);
       t.complete();
