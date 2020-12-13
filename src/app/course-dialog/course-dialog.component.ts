@@ -56,6 +56,11 @@ export class CourseDialogComponent implements OnInit, AfterViewInit {
     }
 
     ngAfterViewInit() {
+
+        fromEvent(this.saveButton.nativeElement, 'click')
+            .pipe(
+                exhaustMap(() => this.saveCourse(this.form.value))
+            ).subscribe();
     }
 
     close() {
