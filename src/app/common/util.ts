@@ -1,24 +1,38 @@
-import { Observable } from "rxjs";
+import {Observable} from 'rxjs';
 
-export function createHttpObservable(url): Observable<any> {
-  return new Observable(t => {
 
-    const controller = new AbortController();
-    const signal = controller.signal;
+export function createHttpObservable(url:string) {
+    return Observable.create(observer => {
 
-    fetch(url, { signal }).then(response => {
-      if (response.ok) {
-        return response.json();
-      }
-      t.error(`Request failed with status code = ${response.status}`);
-    }).then(body => {
-      t.next(body);
-      t.complete();
-    }).catch(err => t.error(err));
+        const controller = new AbortController();
+        const signal = controller.signal;
 
-    return () => {
-      console.log(`unsubcribe----`);
-      controller.abort();
-    };
-  })
+        fetch(url, {signal})
+            .then(response => {
+
+                if (response.ok) {
+                    return response.json();
+                }
+                else {
+                    observer.error('Request failed with status code: ' + response.status);
+                }
+            })
+            .then(body => {
+
+                observer.next(body);
+
+                observer.complete();
+
+            })
+            .catch(err => {
+
+                observer.error(err);
+
+            });
+
+        return () => controller.abort()
+
+
+    });
 }
+
